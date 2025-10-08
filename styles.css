@@ -3783,7 +3783,7 @@ ul {
   color: var(--text-primary);
   background: #f9fafb;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 1.2rem;
   text-align: right;
   border: 1px solid rgba(255, 0, 0, 0.15);
 }
@@ -3843,7 +3843,7 @@ ul {
   .youtube-comparison-table th,
   .youtube-comparison-table td {
     padding: 1rem 0.75rem;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
   }
 
   .feature-name {
