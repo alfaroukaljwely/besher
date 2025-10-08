@@ -1,12 +1,11 @@
 /* Card Pricing Styles */
 .card-pricing {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.8rem;
+  justify-content: center;
+  gap: 1rem;
   margin: 1rem 0;
-  padding: 0.8rem 1rem;
+  padding: 1rem;
   background: linear-gradient(
     135deg,
     rgba(0, 180, 166, 0.1),
@@ -14,30 +13,6 @@
   );
   border-radius: var(--radius-md);
   border: 1px solid rgba(0, 180, 166, 0.2);
-  position: relative;
-  overflow: hidden;
-  flex-wrap: nowrap;
-}
-
-.card-pricing::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.05) 50%,
-    transparent 70%
-  );
-  transform: translateX(-100%);
-  transition: transform 0.6s ease;
-}
-
-.pricing-card:hover .card-pricing::before {
-  transform: translateX(100%);
 }
 
 .original-price {
@@ -46,9 +21,6 @@
   text-decoration: line-through;
   opacity: 0.7;
   font-weight: 500;
-  position: relative;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .current-price {
@@ -56,12 +28,6 @@
   font-weight: 800;
   color: var(--primary);
   text-shadow: 0 2px 4px rgba(0, 180, 166, 0.3);
-  margin: 0;
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  text-align: center;
-  white-space: nowrap;
 }
 
 .discount-badge {
@@ -69,14 +35,10 @@
   color: white;
   padding: 0.3rem 0.8rem;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
-  position: relative;
-  z-index: 1;
-  animation: pulse-discount 2s ease-in-out infinite;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
 @keyframes pulse-discount {
@@ -6009,8 +5971,8 @@ button {
 }
 
 .besher-pricing .original-price {
-  font-size: 1rem;
-  color: var(--text-secondary);
+  font-size: 1.5rem;
+  color: black;
   text-decoration: line-through;
   opacity: 0.7;
   margin: 0;
@@ -6158,7 +6120,7 @@ button {
   }
 
   .besher-pricing {
-    flex-direction: column;
+    flex-direction: row;
     gap: 1rem;
     text-align: center;
     padding: 1rem;
