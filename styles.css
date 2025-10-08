@@ -1484,15 +1484,6 @@ ul {
   position: relative;
 }
 
-.features-grid::before {
-  content: "";
-  position: absolute;
-  top: -3rem;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--youtube-red), transparent);
-}
 
 @media (max-width: 992px) {
   .features-grid {
@@ -2150,8 +2141,8 @@ ul {
 }
 
 .feature-card p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-size: 1.2rem;
   line-height: 1.6;
   margin: 0;
 }
@@ -3770,8 +3761,8 @@ ul {
 
 .feature-column {
   text-align: right;
-  background: rgba(255, 0, 0, 0.2) !important;
-  color: var(--youtube-red);
+  background: rgb(255, 0, 0) !important;
+  color: black;
   font-weight: 700;
   border-right: 4px solid var(--youtube-red);
 }
@@ -3780,7 +3771,7 @@ ul {
   background: var(--gradient-youtube) !important;
   position: relative;
   box-shadow: var(--shadow-red);
-  border: 2px solid rgba(255, 0, 0, 0.3);
+  border: 2px solid rgba(255, 0, 0, 0.252);
 }
 
 .featured-column::before {
@@ -3804,7 +3795,7 @@ ul {
 }
 
 .featured-cell {
-  background: rgba(255, 0, 0, 0.1) !important;
+  background: rgba(0, 255, 162, 0.25) !important;
   font-weight: 700;
   border-left: 3px solid var(--youtube-red);
   border-right: 3px solid var(--youtube-red);
@@ -3816,8 +3807,8 @@ ul {
 }
 
 .feature-name {
-  background: rgba(255, 0, 0, 0.15) !important;
-  color: var(--youtube-red) !important;
+  background: rgba(0, 255, 204, 0.222) !important;
+  color: black !important;
   font-weight: 700;
   text-align: right;
   border-right: 4px solid var(--youtube-red);
@@ -3831,16 +3822,16 @@ ul {
 }
 
 .positive-icon {
-  color: var(--youtube-red);
+  color: green;
   margin-left: 0.5rem;
   transition: all 0.3s ease;
-  text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+  text-shadow: 0 0 5px rgba(13, 255, 0, 0.3);
 }
 
 .positive-icon:hover,
 .negative-icon:hover {
   transform: scale(1.2);
-  text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  text-shadow: 0 0 10px rgba(0, 255, 72, 0.5);
 }
 
 /* Responsive adjustments for comparison table */
