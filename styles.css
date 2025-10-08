@@ -859,10 +859,10 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
   .nav-link {
     display: flex;
     padding: 1rem 1.2rem;
-    font-size: 1rem;
+    font-size: 1.2rem;
     border-radius: 8px;
     width: 100%;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--primary-dark);
     justify-content: space-between;
     align-items: center;
   }
@@ -884,8 +884,8 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
 
   .nav-link:hover,
   .nav-link.active {
-    background: rgba(38, 198, 218, 0.1);
-    color: #fff;
+    background: var(--card-border);
+    color: var(--text-primary);
     padding-right: 1.5rem;
   }
 
@@ -1455,7 +1455,7 @@ ul {
   justify-content: center;
   border-radius: 50%;
   background: rgba(245, 182, 56, 0.1);
-  color: #f5b638;
+  color: var(--primary);
   font-size: 1.8rem;
   transition: all 0.3s ease;
 }
@@ -1484,7 +1484,7 @@ ul {
 .pricing-section .section-subtitle {
   text-align: center;
   max-width: 700px;
-  margin: 0 auto 4rem;
+  margin: 0 auto;
   color: var(--text-secondary);
   font-size: 1.3rem;
 }
@@ -1774,18 +1774,22 @@ ul {
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
-  color: #f5b638;
+  color: var(--primary);
   transition: all 0.3s ease;
 }
 
 .feature-card:hover .feature-icon {
   transform: rotateY(180deg);
-  background: linear-gradient(135deg, #f5b638 0%, #e67e22 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
   color: #1c1619;
 }
 
 .feature-title {
-  color: #f5b638;
+  color: var(--primary);
   font-size: 1.4rem;
   margin-bottom: 1rem;
   font-weight: 700;
@@ -1880,6 +1884,221 @@ ul {
 
 .recommendation-card:hover::before {
   opacity: 1;
+}
+
+.recommendation-icon {
+}
+
+/* YouTube Premium Comparison Cards */
+.youtube-comparison-cards {
+  display: flex;
+  gap: 2rem;
+  margin: 3rem 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.comparison-card {
+  background: #f9fafb;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(0, 180, 166, 0.1);
+}
+
+.comparison-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.comparison-card.featured {
+  border: 2px solid var(--primary);
+  box-shadow: 0 10px 30px rgba(0, 180, 166, 0.2);
+  position: relative;
+  transform: scale(1.05);
+  z-index: 2;
+}
+
+.comparison-card.featured:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 180, 166, 0.3);
+}
+
+.comparison-card.featured::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+}
+
+.card-badge {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  background: var(--gradient-primary);
+  color: white;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  z-index: 3;
+}
+
+.card-header {
+  padding: 2rem 1.5rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 180, 166, 0.1);
+}
+
+.card-title {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.card-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.feature-item:last-child {
+  border-bottom: none;
+}
+
+.feature-icon {
+  font-size: 1.2rem;
+  min-width: 24px;
+  margin-top: 3px;
+}
+
+.feature-icon.positive {
+  color: var(--success);
+}
+
+.feature-icon.negative {
+  color: var(--error);
+}
+
+.feature-item span {
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Individual Plan Features Section */
+.individual-features-section {
+  margin: 4rem 0 2rem;
+  text-align: center;
+}
+
+.individual-features-section .section-subtitle {
+  color: #f5f9f9;
+  font: bolder;
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.feature-card {
+  background: #f9fafb;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 180, 166, 0.1);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.feature-icon-large {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.feature-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (min-width: 992px) {
+  .youtube-comparison-cards {
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+  .comparison-card.featured {
+    transform: scale(1.05);
+  }
+
+  .comparison-card.featured:hover {
+    transform: scale(1.05) translateY(-5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .youtube-comparison-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .comparison-card {
+    max-width: 100%;
+  }
+
+  .comparison-card.featured {
+    transform: scale(1);
+  }
+
+  .comparison-card.featured:hover {
+    transform: scale(1) translateY(-5px);
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .recommendation-icon {
@@ -2115,7 +2334,7 @@ ul {
 }
 
 .social-link.email {
-  background: #ea4335;
+  background: #ff004015;
 }
 
 .social-link.instagram {
@@ -2171,7 +2390,7 @@ ul {
   text-align: center;
   margin-bottom: 3rem;
   position: relative;
-  padding: 2rem 0;
+  padding: 2rem 0 0;
 }
 
 .section-title {
@@ -2707,7 +2926,7 @@ ul {
 /* Pricing Sections */
 .pricing-section {
   padding: 1rem 0;
-  background: #1c1619;
+  background: var(--gradient-secondary);
 }
 
 .section-header {
@@ -3344,6 +3563,130 @@ ul {
 
 .price {
   font-size: 1.4rem;
+}
+
+/* YouTube Premium Comparison Table */
+.youtube-comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 3rem 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  background: #f9fafb;
+  backdrop-filter: blur(10px);
+}
+
+.youtube-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-width: 600px;
+}
+
+.youtube-comparison-table th,
+.youtube-comparison-table td {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(0, 180, 166, 0.15);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.youtube-comparison-table th {
+  background: var(--gradient-primary);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border-bottom: 3px solid rgba(0, 180, 166, 0.5);
+}
+
+.feature-column {
+  text-align: right;
+  background: rgba(0, 180, 166, 0.2) !important;
+  color: var(--primary);
+  font-weight: 700;
+  border-right: 4px solid var(--primary);
+}
+
+.featured-column {
+  background: var(--gradient-primary) !important;
+  position: relative;
+  box-shadow: var(--shadow-cyan);
+  border: 2px solid rgba(0, 180, 166, 0.3);
+}
+
+.featured-column::before {
+  content: none;
+  display: none;
+}
+
+.youtube-comparison-table td {
+  color: var(--text-primary);
+  background: #f9fafb;
+  font-weight: 500;
+  font-size: 1rem;
+  text-align: right;
+}
+
+.youtube-comparison-table td:hover {
+  background: rgba(0, 180, 166, 0.05);
+  transform: scale(1.01);
+}
+
+.featured-cell {
+  background: rgba(0, 180, 166, 0.1) !important;
+  font-weight: 700;
+  border-left: 3px solid var(--primary);
+  border-right: 3px solid var(--primary);
+}
+
+.featured-cell:hover {
+  background: rgba(0, 180, 166, 0.15) !important;
+}
+
+.feature-name {
+  background: rgba(0, 180, 166, 0.15) !important;
+  color: var(--primary) !important;
+  font-weight: 700;
+  text-align: right;
+  border-right: 4px solid var(--primary);
+  font-size: 1.1rem;
+}
+
+.negative-icon {
+  color: var(--error);
+  margin-left: 0.5rem;
+}
+
+.positive-icon {
+  color: var(--success);
+  margin-left: 0.5rem;
+}
+
+/* Responsive adjustments for comparison table */
+@media (max-width: 768px) {
+  .youtube-comparison-table-wrapper {
+    margin: 2rem 0;
+  }
+
+  .youtube-comparison-table th,
+  .youtube-comparison-table td {
+    padding: 1rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .feature-name {
+    font-size: 1rem;
+  }
+
+  .youtube-comparison-table {
+    min-width: 500px;
+  }
+}
+
+.price {
   font-weight: 800;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
@@ -3428,7 +3771,7 @@ ul {
   .section-header {
     flex-direction: column;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
   }
 
   .section-icon {
@@ -3619,6 +3962,7 @@ body {
 }
 
 .accordion-panel li {
+  color: var(--text-secondary);
   margin-bottom: 0.5rem;
   position: relative;
   padding-right: 1.5rem;
@@ -3626,7 +3970,7 @@ body {
 
 .accordion-panel li:before {
   content: "•";
-  color: #f5b638;
+  color: var(--primary-dark);
   font-weight: bold;
   position: absolute;
   right: 0;
@@ -3867,6 +4211,7 @@ body {
   overflow: hidden;
   transition: max-height 0.3s ease;
   background: rgba(38, 198, 218, 0.03);
+  color: var(--text-secondary);
 }
 
 .accordion-panel p {
@@ -4445,7 +4790,7 @@ button {
 }
 
 .feature-icon {
-  color: #ffd607;
+  color: var(--primary);
   margin-left: 0.75rem;
   font-size: 1.5rem;
 }
@@ -5553,6 +5898,325 @@ button {
 
 .btn-youtube-premium:hover::before {
   left: 100%;
+}
+
+/* Besher Card YouTube Premium Styles */
+.besher-card-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.besher-youtube-card {
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.besher-youtube-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary);
+}
+
+.besher-card-header {
+  position: relative;
+  overflow: hidden;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.besher-card-header .card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.3s ease;
+  padding: 1rem;
+}
+
+.besher-youtube-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+.besher-premium-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+  z-index: 2;
+}
+
+.besher-card-content {
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.besher-card-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.besher-pricing {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1rem;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 180, 166, 0.08),
+    rgba(0, 180, 166, 0.03)
+  );
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 180, 166, 0.15);
+  margin: 0;
+}
+
+.price-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.besher-pricing .original-price {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-decoration: line-through;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.besher-pricing .current-price {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0;
+  line-height: 1;
+}
+
+.besher-discount {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.besher-description {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0 0.5rem;
+}
+
+/* Besher Features Grid */
+.besher-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.besher-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.5rem;
+  background: rgba(0, 180, 166, 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 180, 166, 0.1);
+  transition: all 0.3s ease;
+  min-height: 50px;
+}
+
+.besher-feature-item:hover {
+  background: rgba(0, 180, 166, 0.1);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.feature-icon-small {
+  width: 28px;
+  height: 28px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feature-icon-small i {
+  color: white;
+  font-size: 0.8rem;
+}
+
+.besher-feature-item span {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.3;
+  flex: 1;
+}
+
+/* Besher YouTube Button */
+.btn-besher-youtube {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: var(--shadow-teal);
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.btn-besher-youtube::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.btn-besher-youtube:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 180, 166, 0.4);
+  color: white;
+}
+
+.btn-besher-youtube:hover::before {
+  left: 100%;
+}
+
+/* Responsive Design for Besher Card */
+@media (max-width: 768px) {
+  .besher-card-grid {
+    max-width: 100%;
+    padding: 1.5rem 1rem;
+  }
+
+  .besher-card-content {
+    padding: 1.5rem 1rem;
+    gap: 1.25rem;
+  }
+
+  .besher-features-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .besher-pricing {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .price-container {
+    align-items: center;
+  }
+
+  .besher-card-header {
+    height: 180px;
+  }
+
+  .besher-card-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .besher-card-grid {
+    padding: 1rem 0.5rem;
+  }
+
+  .besher-card-content {
+    padding: 1rem 0.75rem;
+    gap: 1rem;
+  }
+
+  .besher-card-header {
+    height: 160px;
+  }
+
+  .besher-card-title {
+    font-size: 1.2rem;
+  }
+
+  .besher-feature-item {
+    padding: 0.5rem;
+    gap: 0.4rem;
+  }
+
+  .feature-icon-small {
+    width: 24px;
+    height: 24px;
+  }
+
+  .feature-icon-small i {
+    font-size: 0.75rem;
+  }
+
+  .besher-feature-item span {
+    font-size: 0.8rem;
+  }
+
+  .btn-besher-youtube {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+  }
 }
 
 /* Light theme background patterns */
