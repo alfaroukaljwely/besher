@@ -1045,19 +1045,19 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
 
 .hero-subtitle {
   font-size: 1.5rem;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   margin-bottom: 2rem;
   line-height: 1.6;
 }
 
 .hero-features {
-  margin: 2rem 0;
+  margin:0 0 2rem;
 }
 
 .hero-features .feature {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
   font-size: 1.4rem;
   transition: all 0.3s ease;
   padding: 0.5rem;
@@ -4652,7 +4652,7 @@ button {
 
 .hero-subtitle {
   font-size: 1.25rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   max-width: 600px;
 }
 
