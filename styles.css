@@ -129,7 +129,7 @@
   --primary-dark: #008a7b; /* Darker teal */
   --secondary: #1a365d; /* Dark blue */
   --accent: #38b2ac; /* Light teal accent */
-  --youtube-red: #FF0000; /* YouTube Premium red */
+  --youtube-red: #ff0000; /* YouTube Premium red */
   --youtube-red-dark: #cc0000; /* Darker YouTube red */
   --background: linear-gradient(
     135deg,
@@ -148,8 +148,12 @@
   --card-border: rgba(0, 180, 166, 0.2);
   --gradient-primary: linear-gradient(135deg, #00b4a6 0%, #008a7b 100%);
   --gradient-secondary: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-  --gradient-youtube: linear-gradient(135deg, #FF0000 0%, #cc0000 100%);
-  --gradient-youtube-light: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(204, 0, 0, 0.05) 100%);
+  --gradient-youtube: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  --gradient-youtube-light: linear-gradient(
+    135deg,
+    rgba(255, 0, 0, 0.1) 0%,
+    rgba(204, 0, 0, 0.05) 100%
+  );
 
   /* Typography */
   --font-primary: "Cairo", sans-serif;
@@ -320,7 +324,11 @@ img {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--youtube-red), var(--youtube-red-dark));
+  background: linear-gradient(
+    135deg,
+    var(--youtube-red),
+    var(--youtube-red-dark)
+  );
   color: white;
   box-shadow: var(--shadow-red);
   position: relative;
@@ -724,7 +732,11 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
   left: 0;
   width: 0;
   height: 100%;
-  background: linear-gradient(90deg, var(--youtube-red-dark), var(--youtube-red));
+  background: linear-gradient(
+    90deg,
+    var(--youtube-red-dark),
+    var(--youtube-red)
+  );
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: -1;
 }
@@ -1051,7 +1063,7 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
 }
 
 .hero-features {
-  margin:0 0 2rem;
+  margin: 0 0 2rem;
 }
 
 .hero-features .feature {
@@ -1483,7 +1495,6 @@ ul {
   margin-top: 3rem;
   position: relative;
 }
-
 
 @media (max-width: 992px) {
   .features-grid {
@@ -2995,7 +3006,11 @@ ul {
 .cta-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
-  background: linear-gradient(135deg, var(--youtube-red-dark), var(--youtube-red));
+  background: linear-gradient(
+    135deg,
+    var(--youtube-red-dark),
+    var(--youtube-red)
+  );
   color: white;
 }
 
@@ -5103,7 +5118,11 @@ button {
 }
 
 .back-to-top:hover {
-  background: linear-gradient(135deg, var(--youtube-red-dark), var(--youtube-red));
+  background: linear-gradient(
+    135deg,
+    var(--youtube-red-dark),
+    var(--youtube-red)
+  );
   transform: translateY(0) scale(1.1);
   color: white;
   box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
@@ -6704,7 +6723,7 @@ button {
 
 .besher-pricing .original-price {
   font-size: 1.2rem;
-  color:black;
+  color: black;
   text-decoration: line-through;
   opacity: 0.7;
   margin: 0;
