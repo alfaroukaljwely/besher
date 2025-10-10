@@ -599,6 +599,173 @@ body.using-mouse :focus:not(:focus-visible) {
   align-items: center;
   transition: all 0.4s ease;
 }
+/* Floating WhatsApp glass button */
+:root {
+  --floating-whatsapp-size-desktop: 64px;
+  --floating-whatsapp-size-tablet: 56px;
+  --floating-whatsapp-size-mobile: 55px;
+  --floating-whatsapp-right-desktop: 25px;
+  --floating-whatsapp-right-mobile: 25px;
+  --floating-whatsapp-bottom-margin: 40px;
+  --back-to-top-height: 60px; /* fallback value - JS will update this */
+}
+
+.floating-whatsapp {
+  position: fixed;
+  right: var(--floating-whatsapp-right-desktop);
+  bottom: calc(
+    var(--floating-whatsapp-bottom-margin) + var(--back-to-top-height, 60px)
+  );
+  width: var(--floating-whatsapp-size-desktop);
+  height: var(--floating-whatsapp-size-desktop);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  text-decoration: none;
+  z-index: 9999;
+  cursor: pointer;
+
+  /* Glassmorphism */
+  background: rgba(144, 240, 125, 0.545);
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 20px rgba(3, 15, 30, 0.25);
+  color: green; /* WhatsApp brand green for icon */
+
+  /* Backdrop filter (may be ignored in unsupported browsers) */
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+
+  transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+  overflow: visible;
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (
+  (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
+) {
+  .floating-whatsapp {
+    background: rgba(0, 0, 0, 0.28);
+    border: 10px solid rgba(255, 255, 255, 0.06);
+  }
+}
+
+.floating-whatsapp .fab-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 70%;
+  height: 70%;
+  position: relative;
+}
+
+.floating-whatsapp .fab {
+  font-size: calc(var(--floating-whatsapp-size-desktop) * 0.45);
+  color: #25d366;
+  display: inline-block;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.08));
+  position: relative;
+  z-index: 2;
+}
+
+.floating-whatsapp .fab::before {
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.06),
+    0 0 10px rgba(37, 211, 102, 0.08);
+}
+
+.floating-whatsapp:hover,
+.floating-whatsapp:focus {
+  transform: translateY(-3px) scale(1.06);
+  box-shadow: 0 12px 30px rgba(3, 15, 30, 0.35);
+  outline: none;
+}
+
+.floating-whatsapp:focus-visible {
+  box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.12),
+    0 12px 30px rgba(3, 15, 30, 0.25);
+  border-color: rgba(37, 211, 102, 0.28);
+}
+
+.floating-whatsapp:active {
+  transform: translateY(0) scale(0.99);
+  transition-duration: 120ms;
+}
+
+.floating-whatsapp::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 54%;
+  height: 54%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 40%,
+    rgba(37, 211, 102, 0.1),
+    rgba(37, 211, 102, 0.02) 40%,
+    transparent 60%
+  );
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.95;
+  transition: opacity 300ms ease;
+  filter: blur(6px);
+}
+
+@keyframes fw-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.98);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.06);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.98);
+    opacity: 0.9;
+  }
+}
+.floating-whatsapp::before {
+  animation: fw-pulse 3.8s ease-in-out infinite;
+}
+
+@media (max-width: 992px) {
+  .floating-whatsapp {
+    width: var(--floating-whatsapp-size-tablet);
+    height: var(--floating-whatsapp-size-tablet);
+    right: var(--floating-whatsapp-right-desktop);
+  }
+  .floating-whatsapp .fab {
+    font-size: calc(var(--floating-whatsapp-size-tablet) * 0.45);
+  }
+}
+
+@media (max-width: 576px) {
+  .floating-whatsapp {
+    width: var(--floating-whatsapp-size-mobile);
+    height: var(--floating-whatsapp-size-mobile);
+    right: var(--floating-whatsapp-right-mobile);
+    bottom: calc(
+      var(--floating-whatsapp-bottom-margin) + var(--back-to-top-height, 60px)
+    );
+  }
+  .floating-whatsapp .fab {
+    font-size: calc(var(--floating-whatsapp-size-mobile) * 0.45);
+  }
+}
+
+.floating-whatsapp[aria-hidden="true"] {
+  display: none;
+}
 
 .nav-list {
   display: flex;
@@ -1973,8 +2140,7 @@ ul {
   opacity: 1;
 }
 
-.recommendation-icon {
-}
+/* .recommendation-icon intentionally left without extra styles; uses utility/icon sizing elsewhere */
 
 /* YouTube Premium Comparison Cards */
 .youtube-comparison-cards {
