@@ -286,43 +286,108 @@ document.addEventListener("DOMContentLoaded", function () {
     document.documentElement.style.scrollBehavior = "auto";
   }
 
-  // Initialize accordion functionality
-  const accordionItems = document.querySelectorAll(".accordion-item");
-
-  accordionItems.forEach((item) => {
-    const header = item.querySelector(".accordion-header");
-    const panel = item.querySelector(".accordion-panel");
-    const icon = header.querySelector(".fa-plus");
-
-    header.addEventListener("click", () => {
-      // Toggle the expanded state
-      const isExpanded = header.getAttribute("aria-expanded") === "true";
-
-      // Close all other accordion items
-      document.querySelectorAll(".accordion-item").forEach((otherItem) => {
-        if (otherItem !== item) {
-          otherItem
-            .querySelector(".accordion-header")
-            .setAttribute("aria-expanded", "false");
-          otherItem.querySelector(".accordion-panel").style.maxHeight = null;
-          otherItem.querySelector(".fa-plus").classList.remove("fa-minus");
-          otherItem.querySelector(".fa-plus").classList.add("fa-plus");
-        }
-      });
-
-      // Toggle current item
-      if (!isExpanded) {
-        header.setAttribute("aria-expanded", "true");
-        panel.style.maxHeight = panel.scrollHeight + "px";
-        icon.classList.remove("fa-plus");
-        icon.classList.add("fa-minus");
-      } else {
-        header.setAttribute("aria-expanded", "false");
-        panel.style.maxHeight = null;
+  // Initialize accordion functionality (delegated, accessible, single-open)
+  const accordion = document.querySelector(".accordion");
+  if (accordion) {
+    const closePanel = (item) => {
+      const header = item.querySelector(".accordion-header");
+      const panel = item.querySelector(".accordion-panel");
+      if (!header || !panel) return;
+      header.setAttribute("aria-expanded", "false");
+      panel.style.maxHeight = null;
+      item.classList.remove("active");
+      const icon = header.querySelector(".fa-plus, .fa-minus");
+      if (icon) {
         icon.classList.remove("fa-minus");
         icon.classList.add("fa-plus");
       }
+    };
+
+    const openPanel = (item) => {
+      const header = item.querySelector(".accordion-header");
+      const panel = item.querySelector(".accordion-panel");
+      if (!header || !panel) return;
+      // close others
+      accordion.querySelectorAll(".accordion-item").forEach((other) => {
+        if (other !== item) closePanel(other);
+      });
+      header.setAttribute("aria-expanded", "true");
+      panel.style.maxHeight = panel.scrollHeight + "px";
+      item.classList.add("active");
+      const icon = header.querySelector(".fa-plus, .fa-minus");
+      if (icon) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      }
+    };
+
+    const toggleItem = (item) => {
+      const header = item.querySelector(".accordion-header");
+      if (!header) return;
+      const isExpanded = header.getAttribute("aria-expanded") === "true";
+      if (isExpanded) closePanel(item);
+      else openPanel(item);
+    };
+
+    // Click delegation: handle clicks on header or any child inside it (icons, spans)
+    accordion.addEventListener("click", (e) => {
+      const header = e.target.closest(".accordion-header");
+      if (!header || !accordion.contains(header)) return;
+      e.preventDefault();
+      const item = header.parentElement;
+      if (!item || !item.classList.contains("accordion-item")) return;
+      toggleItem(item);
     });
+
+    // Keyboard support: Enter and Space toggle when header is focused
+    accordion.addEventListener("keydown", (e) => {
+      const header = e.target.closest(".accordion-header");
+      if (!header || !accordion.contains(header)) return;
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        const item = header.parentElement;
+        if (!item) return;
+        toggleItem(item);
+      }
+    });
+
+    // Initialize according to existing aria-expanded attributes and ensure headers are focusable
+    accordion.querySelectorAll(".accordion-item").forEach((item) => {
+      const header = item.querySelector(".accordion-header");
+      const panel = item.querySelector(".accordion-panel");
+      if (!header || !panel) return;
+      // ensure keyboard focus & role
+      if (!header.hasAttribute("tabindex"))
+        header.setAttribute("tabindex", "0");
+      if (!header.hasAttribute("role")) header.setAttribute("role", "button");
+
+      if (header.getAttribute("aria-expanded") === "true") {
+        panel.style.maxHeight = panel.scrollHeight + "px";
+        item.classList.add("active");
+        const icon = header.querySelector(".fa-plus, .fa-minus");
+        if (icon) {
+          icon.classList.remove("fa-plus");
+          icon.classList.add("fa-minus");
+        }
+      } else {
+        panel.style.maxHeight = null;
+        item.classList.remove("active");
+        const icon = header.querySelector(".fa-plus, .fa-minus");
+        if (icon) {
+          icon.classList.remove("fa-minus");
+          icon.classList.add("fa-plus");
+        }
+      }
+    });
+  }
+  // Close all when clicking outside the accordion
+  document.addEventListener("click", (e) => {
+    // If the click target is not inside the accordion, close all panels
+    if (!accordion.contains(e.target)) {
+      accordion
+        .querySelectorAll(".accordion-item")
+        .forEach((it) => closePanel(it));
+    }
   });
 
   // تحديد جميع العناصر التي تحتوي على سمة data-aos
@@ -469,22 +534,4 @@ pricingCards.forEach((card) => {
 });
 
 // FAQ Accordion
-document.addEventListener("click", (e) => {
-  const header = e.target.closest(".accordion-header");
-  if (!header) return;
-
-  const item = header.parentElement;
-  const isActive = item.classList.contains("active");
-
-  document
-    .querySelectorAll(".accordion-item")
-    .forEach((el) => el.classList.remove("active"));
-  document
-    .querySelectorAll(".accordion-header")
-    .forEach((h) => h.setAttribute("aria-expanded", "false"));
-
-  if (!isActive) {
-    item.classList.add("active");
-    header.setAttribute("aria-expanded", "true");
-  }
-});
+// (legacy handler removed — using delegated accessible implementation above)

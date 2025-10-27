@@ -627,7 +627,7 @@ body.using-mouse :focus:not(:focus-visible) {
   cursor: pointer;
 
   /* Glassmorphism */
-  background: rgba(144, 240, 125, 0.545);
+  background: rgb(43, 255, 0);
   background-image: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.04),
@@ -668,7 +668,7 @@ body.using-mouse :focus:not(:focus-visible) {
 
 .floating-whatsapp .fab {
   font-size: calc(var(--floating-whatsapp-size-desktop) * 0.45);
-  color: #25d366;
+  color: #ffffff;
   display: inline-block;
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.08));
   position: relative;
