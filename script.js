@@ -533,5 +533,150 @@ pricingCards.forEach((card) => {
   });
 });
 
-// FAQ Accordion
-// (legacy handler removed — using delegated accessible implementation above)
+
+
+// Back to top button
+(function () {
+  function updateBackToTopHeight() {
+    try {
+      const backBtn = document.getElementById("backToTop");
+      let backHeight = 0;
+      if (backBtn) {
+        const styles = window.getComputedStyle(backBtn);
+        backHeight =
+          backBtn.getBoundingClientRect().height ||
+          parseFloat(styles.height) ||
+          60;
+      } else {
+        backHeight = 60;
+      }
+
+      // If there's a cookie banner or bottom toolbar, add cushion
+      const bannerSelectors = [
+        ".cookie-banner",
+        ".cookie-consent",
+        "#cookieConsent",
+        ".c-cookie-banner",
+        ".cookie-notice",
+      ];
+      let bannerExtra = 0;
+      for (const sel of bannerSelectors) {
+        const el = document.querySelector(sel);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.height && rect.bottom >= window.innerHeight - 10) {
+            bannerExtra = Math.max(bannerExtra, rect.height + 10);
+          }
+        }
+      }
+
+      const total = Math.ceil(backHeight + 12 + bannerExtra);
+      document.documentElement.style.setProperty(
+        "--back-to-top-height",
+        total + "px"
+      );
+    } catch (e) {
+      document.documentElement.style.setProperty(
+        "--back-to-top-height",
+        "72px"
+      );
+    }
+  }
+
+  window.addEventListener("load", updateBackToTopHeight, {
+    passive: true,
+  });
+  window.addEventListener("resize", updateBackToTopHeight, {
+    passive: true,
+  });
+
+  const backBtn = document.getElementById("backToTop");
+  if (backBtn && "ResizeObserver" in window) {
+    const ro = new ResizeObserver(updateBackToTopHeight);
+    ro.observe(backBtn);
+  }
+
+  if ("MutationObserver" in window) {
+    const mo = new MutationObserver(() => updateBackToTopHeight());
+    mo.observe(document.body, { childList: true, subtree: true });
+  }
+
+  updateBackToTopHeight();
+})();
+
+
+
+// Outbound Link Tracking
+(function () {
+  // Function to get URL parameters
+  function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    const trackingParams = {
+      gclid: params.get("gclid"),
+      gbraid: params.get("gbraid"),
+      wbraid: params.get("wbraid"),
+      utm_source: params.get("utm_source"),
+      utm_medium: params.get("utm_medium"),
+      utm_campaign: params.get("utm_campaign"),
+      utm_term: params.get("utm_term"),
+      utm_content: params.get("utm_content"),
+    };
+
+    // Remove null values
+    Object.keys(trackingParams).forEach((key) => {
+      if (trackingParams[key] === null) {
+        delete trackingParams[key];
+      }
+    });
+
+    return trackingParams;
+  }
+
+  // Function to append parameters to URL
+  function appendTrackingParams(url, params) {
+    const urlObj = new URL(url);
+
+    // If no tracking params found, add default UTM values
+    if (Object.keys(params).length === 0) {
+      params = {
+        utm_source: "landing",
+        utm_medium: "cta",
+        utm_campaign: "iptv_sa",
+      };
+    }
+
+    Object.keys(params).forEach((key) => {
+      urlObj.searchParams.set(key, params[key]);
+    });
+
+    return urlObj.toString();
+  }
+
+  // Initialize tracking on DOM load
+  document.addEventListener("DOMContentLoaded", function () {
+    const trackingParams = getUrlParams();
+
+    // Find all outbound links with data-out attribute
+    const outboundLinks = document.querySelectorAll("a[data-out]");
+
+    outboundLinks.forEach(function (link) {
+      const originalHref = link.getAttribute("href");
+
+      // Only process if it's a valid URL and points to rqgstore.com
+      if (originalHref && originalHref.includes("rqgstore.com")) {
+        try {
+          const updatedUrl = appendTrackingParams(originalHref, trackingParams);
+          link.setAttribute("href", updatedUrl);
+
+          // Ensure rel="noopener" is set
+          const currentRel = link.getAttribute("rel") || "";
+          if (!currentRel.includes("noopener")) {
+            link.setAttribute("rel", currentRel + " noopener");
+          }
+        } catch (e) {
+          console.warn("Failed to update tracking for link:", originalHref, e);
+        }
+      }
+    });
+  });
+})();
