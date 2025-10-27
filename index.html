@@ -7,7 +7,7 @@
   
     <!-- Title & Meta -->
     <title>أفضل اشتراك يوتيوب بريميوم فردي</title>
-    <meta name="description" content=" أفضل اشتراك يوتيوب بريميوم فردي سنة كاملة بالضمان" />
+    <meta name="description" content="أفضل اشتراك يوتيوب بريميوم فردي سنة كاملة بالضمان" />
     <meta name="keywords" content="بشر كارد, اشتراك يوتيوب بريميوم, اشتراك يوتيوب فردي, اشتراكات اليوتيوب" />
     <meta name="theme-color" content="#00b4a6">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -33,12 +33,60 @@
     <!-- Hreflang -->
     <link rel="alternate" href="https://besher.sa/" hreflang="ar-sa">
     <link rel="alternate" href="https://besher.sa/" hreflang="x-default">
-  
-    <!-- Styles & Fonts -->
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="critical.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="critical.css"></noscript>
+    
+    <!-- Load non-critical CSS asynchronously -->
+    <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="styles.css"></noscript>
+    
+    <!-- Preload fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- Load non-critical CSS with low priority -->
+    <link rel="preload" href="https://unpkg.com/aos@2.3.1/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- Inline critical CSS for above-the-fold content -->
+    <style id="critical-css">
+      /* Inlined critical CSS will be loaded here */
+    </style>
+    <script>
+      // Load critical CSS with high priority
+      (function() {
+        const criticalCSS = document.getElementById('critical-css');
+        fetch('critical.css')
+          .then(response => response.text())
+          .then(css => {
+            criticalCSS.textContent = css;
+            // Load non-critical resources after critical CSS is loaded
+            loadNonCriticalResources();
+          })
+          .catch(() => {
+            // Fallback if critical CSS fails to load
+            loadNonCriticalResources();
+          });
+          
+        function loadNonCriticalResources() {
+          // Mark page as loaded for non-critical content
+          document.documentElement.classList.add('loaded');
+          
+          // Load AOS animation library after initial render
+          const aosLink = document.createElement('link');
+          aosLink.rel = 'stylesheet';
+          aosLink.href = 'https://unpkg.com/aos@2.3.1/dist/aos.css';
+          document.head.appendChild(aosLink);
+        }
+      })();
+    </script>
   
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="favicon.ico">
@@ -57,7 +105,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script defer src="/_vercel/insights/script.js"></script>
   </head>
   
-  <body>
+  <body class="non-critical">
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K95SNPCZ"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -860,5 +908,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
 
+    <!-- Load scripts with defer -->
+    <script src="script.js" defer></script>
+    
+    <!-- Load AOS after DOM is fully loaded -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Load AOS after the page is interactive
+        const aosScript = document.createElement('script');
+        aosScript.src = 'https://unpkg.com/aos@2.3.1/dist/aos.js';
+        aosScript.onload = function() {
+          if (typeof AOS !== 'undefined') {
+            AOS.init({
+              duration: 800,
+              once: true,
+              offset: 100
+            });
+          }
+        };
+        document.body.appendChild(aosScript);
+        
+        // Load Font Awesome after the page is interactive
+        const faScript = document.createElement('link');
+        faScript.rel = 'stylesheet';
+        faScript.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css';
+        document.head.appendChild(faScript);
+      });
+    </script>
   </body>
 </html>
