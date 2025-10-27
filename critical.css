@@ -50,7 +50,7 @@ body {
 /* Header & Navigation */
 .header {
   position: fixed;
-  top: 0;
+  top: 40px; /* Height of Ticker Bar */
   left: 0;
   right: 0;
   z-index: 1000;
@@ -82,7 +82,78 @@ body {
   background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
   color: var(--text-primary);
   padding: 6rem 0 0;
-  margin-top: 80px; /* Account for fixed header */
+  margin-top: 120px; /* Account for fixed header (80px) + Ticker Bar (40px) */
+}
+
+/* Ticker Bar */
+.ticker-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--youtube-red);
+  color: white;
+  padding: 0.75rem 0;
+  overflow: hidden;
+  z-index: 1001; /* Higher than header */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ticker-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker 30s linear infinite;
+  will-change: transform;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 2.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.ticker-item i {
+  margin-left: 0.5rem;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Pause animation on hover */
+.ticker-bar:hover .ticker-content {
+  animation-play-state: paused;
+}
+
+/* Responsive Ticker */
+@media (max-width: 768px) {
+  .ticker-item {
+    margin: 0 1.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .ticker-item i {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .ticker-bar {
+    padding: 0.5rem 0;
+  }
+  
+  .ticker-item {
+    margin: 0 1rem;
+    font-size: 0.8rem;
+  }
 }
 
 .hero-container {
