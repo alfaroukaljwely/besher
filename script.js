@@ -2,6 +2,63 @@
  * Combines all functionality from main.js and inline scripts
  */
 
+// Lazy load images using Intersection Observer for better cross-browser support
+function initLazyLoading() {
+  // Skip if IntersectionObserver is not supported
+  if (!('IntersectionObserver' in window)) {
+    return;
+  }
+
+  const lazyImages = [].slice.call(document.querySelectorAll('img[loading="lazy"]'));
+  
+  // Skip if no lazy images found
+  if (lazyImages.length === 0) return;
+
+  const imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        // If the image is already loaded, skip
+        if (img.getAttribute('data-loaded') === 'true') {
+          observer.unobserve(img);
+          return;
+        }
+        
+        // Load the image
+        img.src = img.getAttribute('data-src') || img.src;
+        
+        // Handle image load/error
+        img.onload = function() {
+          img.setAttribute('data-loaded', 'true');
+          img.removeAttribute('data-src');
+        };
+        
+        img.onerror = function() {
+          console.error('Error loading image:', img.src);
+          img.setAttribute('data-loaded', 'error');
+        };
+        
+        // Stop observing this image
+        observer.unobserve(img);
+      }
+    });
+  }, {
+    rootMargin: '200px', // Start loading images 200px before they enter the viewport
+    threshold: 0.01
+  });
+
+  // Observe all lazy images
+  lazyImages.forEach(img => {
+    // Store the original src in data-src if not already done
+    if (!img.hasAttribute('data-src')) {
+      img.setAttribute('data-src', img.src);
+      // Set a placeholder or blank src
+      img.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg=';
+    }
+    imageObserver.observe(img);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   // Initialize AOS (Animate On Scroll)
   if (typeof AOS !== "undefined") {
@@ -63,6 +120,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize first slide
     showImage(0);
   };
+
+  // Initialize lazy loading
+  initLazyLoading();
 
   // Initialize hero image slider
   initHeroImageSlider();
