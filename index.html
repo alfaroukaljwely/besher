@@ -41,12 +41,12 @@
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     
     <!-- Preload critical assets -->
-    <link rel="preload" href="critical.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="critical.css"></noscript>
+    <link rel="preload" href="assets/css/critical.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="assets/css/critical.min.css"></noscript>
     
     <!-- Load non-critical CSS asynchronously -->
-    <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="styles.css"></noscript>
+    <link rel="preload" href="assets/css/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="assets/css/styles.min.css"></noscript>
     
     <!-- Preload fonts -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -63,7 +63,7 @@
       // Load critical CSS with high priority
       (function() {
         const criticalCSS = document.getElementById('critical-css');
-        fetch('critical.css')
+        fetch('assets/css/critical.min.css')
           .then(response => response.text())
           .then(css => {
             criticalCSS.textContent = css;
@@ -249,7 +249,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="hero-image">
           <div class="heroImageSlider" id="heroImageSlider">
-            <img src="img/Baner.webp" alt="besher Plus تطبيقات الهواتف الذكية" class="heroBannerImage active" width="800" height="600" loading="eager" />
+            <img src="assets/img/Baner.webp" alt="besher Plus تطبيقات الهواتف الذكية" class="heroBannerImage active" width="800" height="600" loading="eager" />
           </div>
         </div>
       </div>
@@ -270,7 +270,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <!-- YouTube Premium Individual Package -->
           <div class="pricing-card besher-youtube-card featured" id="youtube-premium-individual" data-aos="fade-up" data-aos-delay="100">
             <div class="card-header besher-card-header">
-              <img src="img/Pricing Plans/Card.webp" alt="اشتراك يوتيوب بريميوم" class="card-image" width="300" height="200" loading="lazy" />
+              <img src="assets/img/Pricing Plans/Card.webp" alt="اشتراك يوتيوب بريميوم" class="card-image" width="300" height="200" loading="lazy" />
               <div class="card-badge besher-premium-badge">الاشتراك الافضل</div>
             </div>
             <div class="card-content besher-card-content">
@@ -611,7 +611,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <ul class="payments-strip" aria-label="وسائل الدفع المقبولة">
             <li class="payment-item">
               <img
-                src="img/payment methods/Visa.webp"
+                src="assets/img/payment methods/Visa.webp"
                 alt="Visa"
                 class="payment-image"
                 width="64"
@@ -621,7 +621,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </li>
             <li class="payment-item">
               <img
-                src="img/payment methods/MasterCard.webp"
+                src="assets/img/payment methods/MasterCard.webp"
                 alt="MasterCard"
                 class="payment-image"
                 width="64"
@@ -631,7 +631,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </li>
             <li class="payment-item">
               <img
-                src="img/payment methods/Google Pay.webp"
+                src="assets/img/payment methods/Google Pay.webp"
                 alt="Google Pay"
                 class="payment-image"
                 width="64"
@@ -641,7 +641,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </li>
             <li class="payment-item">
               <img
-                src="img/payment methods/Apple Pay.webp"
+                src="assets/img/payment methods/Apple Pay.webp"
                 alt="Apple Pay"
                 class="payment-image"
                 width="64"
