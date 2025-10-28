@@ -1473,54 +1473,10 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
 }
 
-@keyframes ticker {
-  0% {
-    transform: translateX(-100);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
 
-/* Pause animation on hover */
-.ticker-bar:hover .ticker-content {
-  animation-play-state: paused;
-}
 
-/* Responsive Ticker */
-@media (max-width: 768px) {
-  .ticker-item {
-    margin: 0 1.5rem;
-    font-size: 0.85rem;
-  }
 
-  .ticker-item i {
-    font-size: 1rem;
-  }
 
-  .ticker-content {
-    animation-duration: 10s;
-  }
-}
-
-@media (max-width: 576px) {
-  .ticker-bar {
-    padding: 0.5rem 0;
-  }
-
-  .ticker-item {
-    margin: 0 1rem;
-    font-size: 0.8rem;
-  }
-
-  .ticker-item i {
-    font-size: 1rem;
-  }
-
-  .ticker-content {
-    animation-duration: 100s;
-  }
-}
 
 /* Smooth Scrolling */
 html {
