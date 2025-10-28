@@ -1193,7 +1193,7 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
 .hero-content {
   flex: 1;
   max-width: 600px;
-  padding: 2rem 0;
+  padding: 2rem 0 0;
 }
 
 .hero-title {
@@ -1201,7 +1201,7 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
   font-weight: 800;
   margin-bottom: 1.5rem;
   line-height: 1.2;
-  background: linear-gradient(90deg, var(--primary), var(--youtube-red));
+  background: var(--youtube-red);
   -webkit-background-clip: text;
   background-clip: text;
   color: var(--primary); /* Fallback color for older browsers */
@@ -1236,17 +1236,12 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
 .hero-features .feature {
   display: flex;
   align-items: center;
-  /* margin-bottom: 1rem; */
   font-size: 1.4rem;
   transition: all 0.3s ease;
   padding: 0.5rem;
   border-radius: var(--radius-sm);
 }
 
-.hero-features .feature:hover {
-  background: rgba(255, 0, 0, 0.05);
-  transform: translateX(-5px);
-}
 
 .hero-features .feature i {
   color: var(--youtube-red);
@@ -1256,11 +1251,6 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
   text-align: center;
   transition: all 0.3s ease;
   text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
-}
-
-.hero-features .feature:hover i {
-  transform: scale(1.2);
-  text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 .hero-cta {
@@ -1374,7 +1364,6 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
   }
 
   .hero-content {
-    margin-bottom: 3rem;
     max-width: 100%;
   }
 
@@ -3642,7 +3631,7 @@ ul {
   margin-bottom: 2rem;
 }
 
-.footer-links h4 {
+.footer-links h1 {
   color: var(--primary);
   font-size: 1.2rem;
   margin-bottom: 1rem;
@@ -3658,7 +3647,7 @@ ul {
 }
 
 .footer-links a {
-  color: #9ca3af;
+  color: #ffffff; 
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -3667,11 +3656,11 @@ ul {
   color: var(--primary);
 }
 
-.footer-bottom {
+.footer-bottom  p{
   text-align: center;
   padding-top: 2rem;
   border-top: 1px solid rgba(38, 198, 218, 0.1);
-  color: #9ca3af;
+  color: #ffffff;
 }
 
 /* Payment Methods */
@@ -3968,23 +3957,11 @@ ul {
   text-align: right;
   border: 1px solid rgba(255, 0, 0, 0.15);
 }
-
-.youtube-comparison-table td:hover {
-  background: rgba(255, 0, 0, 0.05);
-  transform: scale(1.01);
-  box-shadow: 0 0 5px rgba(255, 0, 0, 0.1);
-}
-
 .featured-cell {
   background: rgba(0, 255, 162, 0.25) !important;
   font-weight: 700;
   border-left: 3px solid var(--youtube-red);
   border-right: 3px solid var(--youtube-red);
-}
-
-.featured-cell:hover {
-  background: rgba(255, 0, 0, 0.15) !important;
-  box-shadow: 0 0 5px rgba(255, 0, 0, 0.1);
 }
 
 .feature-name {
@@ -6227,7 +6204,6 @@ button {
 }
 
 /* Add YouTube red to all feature icons across the site */
-.hero-features .feature i,
 .card-features li i,
 .reason-content i,
 .testimonial-rating i,
@@ -6236,7 +6212,6 @@ button {
   transition: all 0.3s ease;
 }
 
-.hero-features .feature:hover i,
 .card-features li:hover i,
 .reason-content:hover i {
   transform: scale(1.2);
