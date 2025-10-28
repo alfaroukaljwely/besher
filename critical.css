@@ -88,18 +88,23 @@ body {
 
 /* Ticker Bar */
 .ticker-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   background: var(--youtube-red);
   color: white;
   padding: 0.75rem 0;
   overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 1001; /* Higher than header */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-red);
+  font-weight: 600;
+  height: 40px; /* Fixed height */
+  display: flex;
+  align-items: center;
   transition: all 0.3s ease;
 }
+
 
 .ticker-content {
   display: inline-block;

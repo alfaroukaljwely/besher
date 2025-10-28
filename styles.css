@@ -1443,28 +1443,8 @@ body.using-mouse .nav-link:focus:not(:focus-visible) {
 }
 
 /* Ticker Bar */
-.ticker-bar {
-  background: var(--youtube-red);
-  color: white;
-  padding: 0.75rem 0;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1001; /* Higher than header */
-  box-shadow: var(--shadow-red);
-  font-weight: 600;
-  height: 40px; /* Fixed height */
-  display: flex;
-  align-items: center;
-  transition: all 0.3s ease;
-}
 
-.ticker-bar:hover {
-  background: var(--youtube-red-dark);
-  box-shadow: 0 4px 20px rgba(204, 0, 0, 0.5);
-}
+
 
 .ticker-item {
   display: inline-flex;
