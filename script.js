@@ -1,805 +1,540 @@
-/**
- * site-optimized.js
- * نسخة مُنقّحة من main.js + inline scripts
- * - واحد IIFE لحماية النطاق العام
- * - تعريف animateOnScrollObserver قبل الاستخدام
- * - lazy loading مُحسّن + placeholder صالح
- * - تحسينات على scroll (rAF) و passive listeners
- * - تجنّب تكرار متغيرات و listeners
- */
-
-(function () {
+!(function () {
   "use strict";
-
-  /* ---------------------------
-   *  Helpers
-   * --------------------------- */
-  const safeQuery = (selector, ctx = document) => ctx.querySelector(selector);
-  const safeQueryAll = (selector, ctx = document) =>
-    Array.prototype.slice.call(ctx.querySelectorAll(selector || "") || []);
-
-  const noop = () => {};
-
-  /* Valid tiny SVG placeholder (base64) to avoid ERR_INVALID_URL */
-  const VALID_SVG_PLACEHOLDER =
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlZWUiLz48L3N2Zz4=";
-
-  /* Utility to safe-set innerText/HTML if element exists */
-  const safeSetText = (selectorOrEl, text) => {
-    const el =
-      typeof selectorOrEl === "string" ? safeQuery(selectorOrEl) : selectorOrEl;
-    if (el) el.textContent = text;
-  };
-
-  /* ---------------------------
-   *  animateOnScrollObserver (defined once)
-   *  - adds class 'aos-animate' when visible
-   *  - unobserves after animate (one-time)
-   * --------------------------- */
-  const animateOnScrollObserver =
-    "IntersectionObserver" in window
-      ? new IntersectionObserver(
-          (entries, obs) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                const t = entry.target;
-                t.classList.add("aos-animate");
-                try {
-                  obs.unobserve(t);
-                } catch (e) {
-                  /* ignore */
+  const t = (t, e = document) => e.querySelector(t),
+    e = (t, e = document) =>
+      Array.prototype.slice.call(e.querySelectorAll(t || "") || []),
+    n =
+      "IntersectionObserver" in window
+        ? new IntersectionObserver(
+            (t, e) => {
+              t.forEach((t) => {
+                if (t.isIntersecting) {
+                  const n = t.target;
+                  n.classList.add("aos-animate");
+                  try {
+                    e.unobserve(n);
+                  } catch (t) {}
                 }
-              }
-            });
-          },
-          { threshold: 0.1 }
-        )
-      : null;
-
-  /* ---------------------------
-   *  Lazy loading images using IntersectionObserver
-   *  - uses data-src pattern and valid placeholder
-   * --------------------------- */
-  function initLazyLoading() {
-    if (!("IntersectionObserver" in window)) return;
-
-    const lazyImages = safeQueryAll('img[loading="lazy"]');
-    if (!lazyImages.length) return;
-
-    const io = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const img = entry.target;
-          if (img.getAttribute("data-loaded") === "true") {
-            observer.unobserve(img);
-            return;
-          }
-
-          // set actual src from data-src or keep current src
-          const dataSrc = img.getAttribute("data-src");
-          if (dataSrc) img.src = dataSrc;
-
-          img.onload = function () {
-            try {
-              img.setAttribute("data-loaded", "true");
-              img.removeAttribute("data-src");
-            } catch (e) {}
-          };
-
-          img.onerror = function () {
-            console.error("Error loading image:", img.src);
-            img.setAttribute("data-loaded", "error");
-          };
-
-          observer.unobserve(img);
-        });
-      },
-      {
-        rootMargin: "200px",
-        threshold: 0.01,
-      }
-    );
-
-    lazyImages.forEach((img) => {
-      // preserve existing data-src if present, otherwise set it
-      if (!img.hasAttribute("data-src")) {
-        img.setAttribute("data-src", img.src || "");
-      }
-      // set a valid tiny placeholder to avoid ERR_INVALID_URL
-      if (!img.src || img.src.trim() === "") {
-        img.src = VALID_SVG_PLACEHOLDER;
-      }
-      io.observe(img);
-    });
-  }
-
-  /* ---------------------------
-   *  Hero image slider (safe init)
-   * --------------------------- */
-  function initHeroImageSlider() {
-    const slider = safeQuery("#heroImageSlider");
-    if (!slider) return;
-
-    const images = slider.querySelectorAll(".heroBannerImage");
-    if (!images || images.length < 2) return;
-
-    let currentIndex = 0;
-    const slideIntervalMs = 7000;
-    let slideTimer = null;
-
-    const showImage = (index) => {
-      images.forEach((img, i) => {
-        img.classList.toggle("active", i === index);
-        img.classList.toggle("fadeIn", i === index);
-      });
-    };
-
-    const nextSlide = () => {
-      currentIndex = (currentIndex + 1) % images.length;
-      showImage(currentIndex);
-    };
-
-    const start = () => {
-      if (slideTimer) clearInterval(slideTimer);
-      slideTimer = setInterval(nextSlide, slideIntervalMs);
-    };
-    const stop = () => {
-      if (slideTimer) {
-        clearInterval(slideTimer);
-        slideTimer = null;
-      }
-    };
-
-    slider.addEventListener("mouseenter", stop, { passive: true });
-    slider.addEventListener("mouseleave", start, { passive: true });
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) stop();
-      else start();
-    });
-
-    showImage(0);
-    start();
-  }
-
-  /* ---------------------------
-   *  Header behavior + Back-to-Top (single unified logic)
-   *  - uses rAF to avoid layout thrash
-   * --------------------------- */
-  function initHeaderAndBackToTop() {
-    const header = safeQuery("#header");
-    const navMenu = safeQuery("#mainNav");
-    const navLinks = safeQueryAll("[data-nav-link]");
-    const backToTopBtn = safeQuery("#backToTop");
-
-    if (!header) return;
-
-    let lastScroll = 0;
-    let ticking = false;
-    const headerHeight = header.offsetHeight || 80;
-
-    const updateHeader = () => {
-      const currentScroll = window.pageYOffset || window.scrollY || 0;
-
-      // scrolled class
-      header.classList.toggle("scrolled", currentScroll > 50);
-
-      // hide/show header only if mobile menu not open
-      if (!navMenu || !navMenu.classList.contains("active")) {
-        if (currentScroll > lastScroll && currentScroll > headerHeight) {
-          header.classList.add("hide");
-        } else {
-          header.classList.remove("hide");
-        }
-      }
-
-      // back-to-top visibility
-      if (backToTopBtn) {
-        backToTopBtn.classList.toggle("show", currentScroll > 300);
-      }
-
-      lastScroll = Math.max(0, currentScroll);
-      ticking = false;
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateHeader);
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    updateHeader();
-
-    // Back to top click (if exists)
-    if (backToTopBtn) {
-      backToTopBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-
-        const hdr = document.querySelector("header");
-        if (hdr) {
-          hdr.setAttribute("tabindex", "-1");
-          hdr.focus({ preventScroll: true });
-        }
-      });
+              });
+            },
+            { threshold: 0.1 }
+          )
+        : null;
+  function o() {
+    const e = t(".cta-timer");
+    if (!e) return;
+    const n = e.getAttribute("data-countdown-date");
+    if (!n) return;
+    const o = Date.now();
+    let a = new Date(n).getTime();
+    if (isNaN(a) || a < o) {
+      const t = new Date(o + 3456e5);
+      return void e.setAttribute("data-countdown-date", t.toISOString());
     }
-
-    // Mobile menu toggle (keeps body scroll locked)
-    const mobileMenuBtn = safeQuery("#mobileMenuBtn");
-    if (mobileMenuBtn && navMenu) {
-      const toggleMobileMenu = (show) => {
-        navMenu.classList.toggle("active", show);
-        mobileMenuBtn.setAttribute("aria-expanded", show ? "true" : "false");
-        mobileMenuBtn.classList.toggle("active", show);
-        document.body.style.overflow = show ? "hidden" : "";
-      };
-
-      mobileMenuBtn.addEventListener("click", () => {
-        const isExpanded =
-          mobileMenuBtn.getAttribute("aria-expanded") === "true";
-        toggleMobileMenu(!isExpanded);
-      });
-
-      // close on outside click
-      document.addEventListener(
-        "click",
-        (e) => {
-          const isInside =
-            navMenu.contains(e.target) || mobileMenuBtn.contains(e.target);
-          if (!isInside && navMenu.classList.contains("active"))
-            toggleMobileMenu(false);
-        },
-        { passive: true }
-      );
-
-      navLinks.forEach((link) => {
-        link.addEventListener(
-          "click",
-          () => {
-            if (window.innerWidth <= 992) toggleMobileMenu(false);
-          },
-          { passive: true }
-        );
-      });
-    }
-  }
-
-  /* ---------------------------
-   *  Smooth scrolling for anchors & recommendation buttons
-   * --------------------------- */
-  function initSmoothScrolls() {
-    // recommendation buttons (href="#id")
-    safeQueryAll(".recommendation-button").forEach((btn) => {
-      btn.addEventListener(
-        "click",
-        function (e) {
-          e.preventDefault();
-          const href = this.getAttribute("href") || "";
-          const targetId = href.startsWith("#") ? href.substring(1) : href;
-          const target = document.getElementById(targetId);
-          if (target)
-            target.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-              inline: "nearest",
-            });
-        },
-        { passive: true }
-      );
-    });
-
-    // other anchor links
-    safeQueryAll('a[href^="#"]:not(.recommendation-button)').forEach(
-      (anchor) => {
-        anchor.addEventListener(
-          "click",
-          function (e) {
-            const targetId = this.getAttribute("href");
-            if (!targetId || targetId === "#") return;
-            const targetEl = document.querySelector(targetId);
-            if (targetEl) {
-              e.preventDefault();
-              // compute top with header offset safely (avoids forced reflow in loops)
-              const top = Math.max(
-                0,
-                targetEl.getBoundingClientRect().top + window.scrollY - 80
-              );
-              window.scrollTo({ top, behavior: "smooth" });
-            }
-          },
-          { passive: true }
-        );
-      }
-    );
-  }
-
-  /* ---------------------------
-   *  Active nav link on scroll (optimized)
-   * --------------------------- */
-  function initActiveNavOnScroll() {
-    const sections = safeQueryAll("section[id]");
-    const navLinks = safeQueryAll("[data-nav-link]");
-
-    if (!sections.length || !navLinks.length) return;
-
-    let ticking = false;
-
-    const setActive = () => {
-      const scrollPos = window.scrollY + 100;
-      sections.forEach((section) => {
-        const top = section.offsetTop;
-        const height = section.offsetHeight;
-        const id = section.getAttribute("id");
-        if (scrollPos >= top && scrollPos < top + height) {
-          navLinks.forEach((link) => {
-            link.classList.toggle(
-              "active",
-              link.getAttribute("href") === `#${id}`
-            );
-          });
-        }
-      });
-      ticking = false;
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(setActive);
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("load", setActive);
-    window.addEventListener("scroll", onScroll, { passive: true });
-  }
-
-  /* ---------------------------
-   *  CTA countdown timer (robust)
-   * --------------------------- */
-  function updateCountdown() {
-    const countdownContainer = safeQuery(".cta-timer");
-    if (!countdownContainer) return;
-
-    const targetDateStr = countdownContainer.getAttribute(
-      "data-countdown-date"
-    );
-    if (!targetDateStr) return;
-
-    const now = Date.now();
-    let countDownDate = new Date(targetDateStr).getTime();
-
-    const fourDaysMs = 4 * 24 * 60 * 60 * 1000;
-
-    if (isNaN(countDownDate) || countDownDate < now) {
-      const newDate = new Date(now + fourDaysMs);
-      countdownContainer.setAttribute(
-        "data-countdown-date",
-        newDate.toISOString()
-      );
-      return;
-    }
-
-    const distance = countDownDate - now;
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    const elDays = safeQuery("#days");
-    const elHours = safeQuery("#hours");
-    const elMinutes = safeQuery("#minutes");
-    const elSeconds = safeQuery("#seconds");
-    if (elDays) elDays.innerHTML = days.toString().padStart(2, "0");
-    if (elHours) elHours.innerHTML = hours.toString().padStart(2, "0");
-    if (elMinutes) elMinutes.innerHTML = minutes.toString().padStart(2, "0");
-    if (elSeconds) elSeconds.innerHTML = seconds.toString().padStart(2, "0");
-
-    if (days < 1) {
-      const countdown = safeQuery(".countdown");
-      if (countdown) countdown.classList.add("animate-pulse");
-    }
-  }
-
-  /* ---------------------------
-   *  Pricing cards hover (non-blocking)
-   * --------------------------- */
-  function initPricingCardHover() {
-    const pricingCards = safeQueryAll(".pricing-card");
-    if (!pricingCards.length) return;
-
-    pricingCards.forEach((card) => {
-      const orderButton = card.querySelector(".order-now-btn");
-
-      card.addEventListener(
-        "mouseenter",
-        function (e) {
-          if (orderButton && e.target === orderButton) return;
-
-          if (!card.classList.contains("featured")) {
-            pricingCards.forEach((otherCard) => {
-              if (!otherCard.classList.contains("featured")) {
-                otherCard.style.transform = "scale(0.98)";
-                otherCard.style.opacity = "0.9";
-              }
-            });
-            card.style.transform = "translateY(-10px)";
-            card.style.opacity = "1";
-          }
-        },
-        { passive: true }
-      );
-
-      card.addEventListener(
-        "mouseleave",
-        function () {
-          if (!card.classList.contains("featured")) {
-            pricingCards.forEach((otherCard) => {
-              if (!otherCard.classList.contains("featured")) {
-                otherCard.style.transform = "scale(1)";
-                otherCard.style.opacity = "1";
-              }
-            });
-            card.style.transform = "";
-            card.style.opacity = "";
-          }
-        },
-        { passive: true }
-      );
-    });
-  }
-
-  /* ---------------------------
-   *  Accordion (accessible, delegated)
-   * --------------------------- */
-  function initAccordion() {
-    const accordion = safeQuery(".accordion");
-    if (!accordion) return;
-
-    const closePanel = (item) => {
-      const header = item.querySelector(".accordion-header");
-      const panel = item.querySelector(".accordion-panel");
-      if (!header || !panel) return;
-      header.setAttribute("aria-expanded", "false");
-      panel.style.maxHeight = null;
-      item.classList.remove("active");
-      const icon = header.querySelector(".fa-plus, .fa-minus");
-      if (icon) {
-        icon.classList.remove("fa-minus");
-        icon.classList.add("fa-plus");
-      }
-    };
-
-    const openPanel = (item) => {
-      const header = item.querySelector(".accordion-header");
-      const panel = item.querySelector(".accordion-panel");
-      if (!header || !panel) return;
-      accordion.querySelectorAll(".accordion-item").forEach((other) => {
-        if (other !== item) closePanel(other);
-      });
-      header.setAttribute("aria-expanded", "true");
-      panel.style.maxHeight = panel.scrollHeight + "px";
-      item.classList.add("active");
-      const icon = header.querySelector(".fa-plus, .fa-minus");
-      if (icon) {
-        icon.classList.remove("fa-plus");
-        icon.classList.add("fa-minus");
-      }
-    };
-
-    const toggleItem = (item) => {
-      const header = item.querySelector(".accordion-header");
-      if (!header) return;
-      const isExpanded = header.getAttribute("aria-expanded") === "true";
-      if (isExpanded) closePanel(item);
-      else openPanel(item);
-    };
-
-    accordion.addEventListener("click", (e) => {
-      const header = e.target.closest(".accordion-header");
-      if (!header || !accordion.contains(header)) return;
-      e.preventDefault();
-      const item = header.parentElement;
-      if (!item || !item.classList.contains("accordion-item")) return;
-      toggleItem(item);
-    });
-
-    accordion.addEventListener("keydown", (e) => {
-      const header = e.target.closest(".accordion-header");
-      if (!header || !accordion.contains(header)) return;
-      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
-        e.preventDefault();
-        const item = header.parentElement;
-        if (!item) return;
-        toggleItem(item);
-      }
-    });
-
-    accordion.querySelectorAll(".accordion-item").forEach((item) => {
-      const header = item.querySelector(".accordion-header");
-      const panel = item.querySelector(".accordion-panel");
-      if (!header || !panel) return;
-      if (!header.hasAttribute("tabindex"))
-        header.setAttribute("tabindex", "0");
-      if (!header.hasAttribute("role")) header.setAttribute("role", "button");
-
-      if (header.getAttribute("aria-expanded") === "true") {
-        panel.style.maxHeight = panel.scrollHeight + "px";
-        item.classList.add("active");
-        const icon = header.querySelector(".fa-plus, .fa-minus");
-        if (icon) {
-          icon.classList.remove("fa-plus");
-          icon.classList.add("fa-minus");
-        }
-      } else {
-        panel.style.maxHeight = null;
-        item.classList.remove("active");
-        const icon = header.querySelector(".fa-plus, .fa-minus");
-        if (icon) {
-          icon.classList.remove("fa-minus");
-          icon.classList.add("fa-plus");
-        }
-      }
-    });
-
-    // Close all when clicking outside
-    document.addEventListener(
-      "click",
-      (e) => {
-        if (!accordion.contains(e.target)) {
-          accordion
-            .querySelectorAll(".accordion-item")
-            .forEach((it) => closePanel(it));
-        }
-      },
-      { passive: true }
-    );
-  }
-
-  /* ---------------------------
-   *  AOS fallback (if library not present uses our observer)
-   * --------------------------- */
-  function initAosFallback() {
-    const animatedElements = safeQueryAll("[data-aos]");
-    if (!animatedElements.length) return;
-
-    // If AOS library is present, it already handles it
-    if (typeof AOS !== "undefined") {
-      try {
-        AOS.init({
-          duration: 800,
-          easing: "ease-in-out",
-          once: true,
-          offset: 100,
-        });
-      } catch (e) {}
-      return;
-    }
-
-    // Use our animateOnScrollObserver if available
-    if (animateOnScrollObserver) {
-      animatedElements.forEach((el) => {
-        el.classList.add("aos-init");
-        if (el.dataset.aosDelay)
-          el.style.transitionDelay = `${el.dataset.aosDelay}ms`;
-        if (el.dataset.aosDuration)
-          el.style.transitionDuration = `${el.dataset.aosDuration}ms`;
-        animateOnScrollObserver.observe(el);
-      });
-    } else {
-      // If no observer support, just reveal elements
-      animatedElements.forEach((el) => el.classList.add("aos-animate"));
-    }
-  }
-
-  /* ---------------------------
-   *  Outbound link tracking (safe)
-   * --------------------------- */
-  (function initOutboundTracking() {
-    function getUrlParams() {
-      const params = new URLSearchParams(window.location.search);
-      const trackingParams = {
-        gclid: params.get("gclid"),
-        gbraid: params.get("gbraid"),
-        wbraid: params.get("wbraid"),
-        utm_source: params.get("utm_source"),
-        utm_medium: params.get("utm_medium"),
-        utm_campaign: params.get("utm_campaign"),
-        utm_term: params.get("utm_term"),
-        utm_content: params.get("utm_content"),
-      };
-      Object.keys(trackingParams).forEach((k) => {
-        if (trackingParams[k] === null) delete trackingParams[k];
-      });
-      return trackingParams;
-    }
-
-    function appendTrackingParams(url, params) {
-      try {
-        const urlObj = new URL(url);
-        if (Object.keys(params).length === 0) {
-          params = {
-            utm_source: "landing",
-            utm_medium: "cta",
-            utm_campaign: "iptv_sa",
-          };
-        }
-        Object.keys(params).forEach((key) =>
-          urlObj.searchParams.set(key, params[key])
-        );
-        return urlObj.toString();
-      } catch (e) {
-        return url;
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const params = getUrlParams();
-      const outboundLinks = safeQueryAll("a[data-out]");
-      outboundLinks.forEach((link) => {
-        const originalHref = link.getAttribute("href");
-        if (!originalHref || !originalHref.includes("rqgstore.com")) return;
-        try {
-          const updated = appendTrackingParams(originalHref, params);
-          link.setAttribute("href", updated);
-          const currentRel = link.getAttribute("rel") || "";
-          if (!currentRel.includes("noopener"))
-            link.setAttribute("rel", (currentRel + " noopener").trim());
-        } catch (e) {
-          console.warn("Failed to update tracking for link:", originalHref, e);
-        }
-      });
-    });
-  })();
-
-  /* ---------------------------
-   *  Back-to-top height manager (keeps CSS var correct)
-   * --------------------------- */
-  (function initBackToTopHeight() {
-    function updateBackToTopHeight() {
-      try {
-        const backBtn = document.getElementById("backToTop");
-        let backHeight = 0;
-        if (backBtn) {
-          const styles = window.getComputedStyle(backBtn);
-          backHeight =
-            backBtn.getBoundingClientRect().height ||
-            parseFloat(styles.height) ||
-            60;
-        } else {
-          backHeight = 60;
-        }
-
-        const bannerSelectors = [
-          ".cookie-banner",
-          ".cookie-consent",
-          "#cookieConsent",
-          ".c-cookie-banner",
-          ".cookie-notice",
-        ];
-        let bannerExtra = 0;
-        for (const sel of bannerSelectors) {
-          const el = document.querySelector(sel);
-          if (el) {
-            const rect = el.getBoundingClientRect();
-            if (rect.height && rect.bottom >= window.innerHeight - 10) {
-              bannerExtra = Math.max(bannerExtra, rect.height + 10);
-            }
-          }
-        }
-
-        const total = Math.ceil(backHeight + 12 + bannerExtra);
-        document.documentElement.style.setProperty(
-          "--back-to-top-height",
-          total + "px"
-        );
-      } catch (e) {
-        document.documentElement.style.setProperty(
-          "--back-to-top-height",
-          "72px"
-        );
-      }
-    }
-
-    window.addEventListener("load", updateBackToTopHeight, { passive: true });
-    window.addEventListener("resize", updateBackToTopHeight, { passive: true });
-
-    const backBtn = document.getElementById("backToTop");
-    if (backBtn && "ResizeObserver" in window) {
-      try {
-        const ro = new ResizeObserver(updateBackToTopHeight);
-        ro.observe(backBtn);
-      } catch (e) {}
-    }
-
-    if ("MutationObserver" in window) {
-      try {
-        const mo = new MutationObserver(() => updateBackToTopHeight());
-        mo.observe(document.body, { childList: true, subtree: true });
-      } catch (e) {}
-    }
-
-    updateBackToTopHeight();
-  })();
-
-  /* ---------------------------
-   *  Init on DOMContentLoaded
-   * --------------------------- */
-  document.addEventListener("DOMContentLoaded", () => {
-    // AOS library init or fallback
-    initAosFallback();
-
-    // Lazy loading & hero slider
-    initLazyLoading();
-    initHeroImageSlider();
-
-    // Header, nav, back-to-top
-    initHeaderAndBackToTop();
-
-    // Smooth scrolls
-    initSmoothScrolls();
-
-    // Active link
-    initActiveNavOnScroll();
-
-    // Pricing cards hover
-    initPricingCardHover();
-
-    // Accordion
-    initAccordion();
-
-    // Countdown initial setup (if needed)
-    const countdownContainer = safeQuery(".cta-timer");
+    const s = a - o,
+      r = Math.floor(s / 864e5),
+      i = Math.floor((s % 864e5) / 36e5),
+      c = Math.floor((s % 36e5) / 6e4),
+      d = Math.floor((s % 6e4) / 1e3),
+      l = t("#days"),
+      u = t("#hours"),
+      f = t("#minutes"),
+      m = t("#seconds");
     if (
-      countdownContainer &&
-      !countdownContainer.getAttribute("data-countdown-date")
+      (l && (l.innerHTML = r.toString().padStart(2, "0")),
+      u && (u.innerHTML = i.toString().padStart(2, "0")),
+      f && (f.innerHTML = c.toString().padStart(2, "0")),
+      m && (m.innerHTML = d.toString().padStart(2, "0")),
+      r < 1)
     ) {
-      const fourDaysMs = 4 * 24 * 60 * 60 * 1000;
-      const targetDate = new Date(Date.now() + fourDaysMs);
-      countdownContainer.setAttribute(
-        "data-countdown-date",
-        targetDate.toISOString()
-      );
+      const e = t(".countdown");
+      e && e.classList.add("animate-pulse");
     }
-  });
-
-  /* ---------------------------
-   *  Init things that need window.load
-   * --------------------------- */
-  window.addEventListener(
-    "load",
-    () => {
-      // kickoff countdown updates
-      updateCountdown();
-      try {
-        setInterval(updateCountdown, 1000);
-      } catch (e) {}
-
-      // small nav item entrance animation - safe & one-time
-      const navLinks = safeQueryAll("[data-nav-link]");
-      navLinks.forEach((link, index) => {
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    const t = (function () {
+      const t = new URLSearchParams(window.location.search),
+        e = {
+          gclid: t.get("gclid"),
+          gbraid: t.get("gbraid"),
+          wbraid: t.get("wbraid"),
+          utm_source: t.get("utm_source"),
+          utm_medium: t.get("utm_medium"),
+          utm_campaign: t.get("utm_campaign"),
+          utm_term: t.get("utm_term"),
+          utm_content: t.get("utm_content"),
+        };
+      return (
+        Object.keys(e).forEach((t) => {
+          null === e[t] && delete e[t];
+        }),
+        e
+      );
+    })();
+    e("a[data-out]").forEach((e) => {
+      const n = e.getAttribute("href");
+      if (n && n.includes("rqgstore.com"))
         try {
-          link.style.opacity = "0";
-          link.style.transform = "translateY(10px)";
-          link.style.transition = `opacity 0.3s ease ${
-            index * 0.1
-          }s, transform 0.3s ease ${index * 0.1}s`;
-          // trigger reflow in a safe way
-          void link.offsetWidth;
-          link.style.opacity = "1";
-          link.style.transform = "translateY(0)";
-        } catch (e) {}
-      });
-    },
-    { passive: true }
-  );
-
-  /* ---------------------------
-   *  End of file
-   * --------------------------- */
+          const o = (function (t, e) {
+            try {
+              const n = new URL(t);
+              return (
+                0 === Object.keys(e).length &&
+                  (e = {
+                    utm_source: "landing",
+                    utm_medium: "cta",
+                    utm_campaign: "iptv_sa",
+                  }),
+                Object.keys(e).forEach((t) => n.searchParams.set(t, e[t])),
+                n.toString()
+              );
+            } catch (e) {
+              return t;
+            }
+          })(n, t);
+          e.setAttribute("href", o);
+          const a = e.getAttribute("rel") || "";
+          a.includes("noopener") ||
+            e.setAttribute("rel", (a + " noopener").trim());
+        } catch (t) {
+          console.warn("Failed to update tracking for link:", n, t);
+        }
+    });
+  }),
+    (function () {
+      function t() {
+        try {
+          const t = document.getElementById("backToTop");
+          let e = 0;
+          if (t) {
+            const n = window.getComputedStyle(t);
+            e = t.getBoundingClientRect().height || parseFloat(n.height) || 60;
+          } else e = 60;
+          const n = [
+            ".cookie-banner",
+            ".cookie-consent",
+            "#cookieConsent",
+            ".c-cookie-banner",
+            ".cookie-notice",
+          ];
+          let o = 0;
+          for (const t of n) {
+            const e = document.querySelector(t);
+            if (e) {
+              const t = e.getBoundingClientRect();
+              t.height &&
+                t.bottom >= window.innerHeight - 10 &&
+                (o = Math.max(o, t.height + 10));
+            }
+          }
+          const a = Math.ceil(e + 12 + o);
+          document.documentElement.style.setProperty(
+            "--back-to-top-height",
+            a + "px"
+          );
+        } catch (t) {
+          document.documentElement.style.setProperty(
+            "--back-to-top-height",
+            "72px"
+          );
+        }
+      }
+      window.addEventListener("load", t, { passive: !0 }),
+        window.addEventListener("resize", t, { passive: !0 });
+      const e = document.getElementById("backToTop");
+      if (e && "ResizeObserver" in window)
+        try {
+          new ResizeObserver(t).observe(e);
+        } catch (t) {}
+      if ("MutationObserver" in window)
+        try {
+          new MutationObserver(() => t()).observe(document.body, {
+            childList: !0,
+            subtree: !0,
+          });
+        } catch (t) {}
+      t();
+    })(),
+    document.addEventListener("DOMContentLoaded", () => {
+      !(function () {
+        const t = e("[data-aos]");
+        if (t.length)
+          if ("undefined" == typeof AOS)
+            n
+              ? t.forEach((t) => {
+                  t.classList.add("aos-init"),
+                    t.dataset.aosDelay &&
+                      (t.style.transitionDelay = `${t.dataset.aosDelay}ms`),
+                    t.dataset.aosDuration &&
+                      (t.style.transitionDuration = `${t.dataset.aosDuration}ms`),
+                    n.observe(t);
+                })
+              : t.forEach((t) => t.classList.add("aos-animate"));
+          else
+            try {
+              AOS.init({
+                duration: 800,
+                easing: "ease-in-out",
+                once: !0,
+                offset: 100,
+              });
+            } catch (t) {}
+      })(),
+        (function () {
+          if (!("IntersectionObserver" in window)) return;
+          const t = e('img[loading="lazy"]');
+          if (!t.length) return;
+          const n = new IntersectionObserver(
+            (t, e) => {
+              t.forEach((t) => {
+                if (!t.isIntersecting) return;
+                const n = t.target;
+                if ("true" === n.getAttribute("data-loaded"))
+                  return void e.unobserve(n);
+                const o = n.getAttribute("data-src");
+                o && (n.src = o),
+                  (n.onload = function () {
+                    try {
+                      n.setAttribute("data-loaded", "true"),
+                        n.removeAttribute("data-src");
+                    } catch (t) {}
+                  }),
+                  (n.onerror = function () {
+                    console.error("Error loading image:", n.src),
+                      n.setAttribute("data-loaded", "error");
+                  }),
+                  e.unobserve(n);
+              });
+            },
+            { rootMargin: "200px", threshold: 0.01 }
+          );
+          t.forEach((t) => {
+            t.hasAttribute("data-src") ||
+              t.setAttribute("data-src", t.src || ""),
+              (t.src && "" !== t.src.trim()) ||
+                (t.src =
+                  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlZWUiLz48L3N2Zz4="),
+              n.observe(t);
+          });
+        })(),
+        (function () {
+          const e = t("#heroImageSlider");
+          if (!e) return;
+          const n = e.querySelectorAll(".heroBannerImage");
+          if (!n || n.length < 2) return;
+          let o = 0,
+            a = null;
+          const s = (t) => {
+              n.forEach((e, n) => {
+                e.classList.toggle("active", n === t),
+                  e.classList.toggle("fadeIn", n === t);
+              });
+            },
+            r = () => {
+              (o = (o + 1) % n.length), s(o);
+            },
+            i = () => {
+              a && clearInterval(a), (a = setInterval(r, 7e3));
+            },
+            c = () => {
+              a && (clearInterval(a), (a = null));
+            };
+          e.addEventListener("mouseenter", c, { passive: !0 }),
+            e.addEventListener("mouseleave", i, { passive: !0 }),
+            document.addEventListener("visibilitychange", () => {
+              document.hidden ? c() : i();
+            }),
+            s(0),
+            i();
+        })(),
+        (function () {
+          const n = t("#header"),
+            o = t("#mainNav"),
+            a = e("[data-nav-link]"),
+            s = t("#backToTop");
+          if (!n) return;
+          let r = 0,
+            i = !1;
+          const c = n.offsetHeight || 80,
+            d = () => {
+              const t = window.pageYOffset || window.scrollY || 0;
+              n.classList.toggle("scrolled", t > 50),
+                (o && o.classList.contains("active")) ||
+                  (t > r && t > c
+                    ? n.classList.add("hide")
+                    : n.classList.remove("hide")),
+                s && s.classList.toggle("show", t > 300),
+                (r = Math.max(0, t)),
+                (i = !1);
+            };
+          window.addEventListener(
+            "scroll",
+            () => {
+              i || (window.requestAnimationFrame(d), (i = !0));
+            },
+            { passive: !0 }
+          ),
+            d(),
+            s &&
+              s.addEventListener("click", (t) => {
+                t.preventDefault(),
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                const e = document.querySelector("header");
+                e &&
+                  (e.setAttribute("tabindex", "-1"),
+                  e.focus({ preventScroll: !0 }));
+              });
+          const l = t("#mobileMenuBtn");
+          if (l && o) {
+            const t = (t) => {
+              o.classList.toggle("active", t),
+                l.setAttribute("aria-expanded", t ? "true" : "false"),
+                l.classList.toggle("active", t),
+                (document.body.style.overflow = t ? "hidden" : "");
+            };
+            l.addEventListener("click", () => {
+              const e = "true" === l.getAttribute("aria-expanded");
+              t(!e);
+            }),
+              document.addEventListener(
+                "click",
+                (e) => {
+                  !o.contains(e.target) &&
+                    !l.contains(e.target) &&
+                    o.classList.contains("active") &&
+                    t(!1);
+                },
+                { passive: !0 }
+              ),
+              a.forEach((e) => {
+                e.addEventListener(
+                  "click",
+                  () => {
+                    window.innerWidth <= 992 && t(!1);
+                  },
+                  { passive: !0 }
+                );
+              });
+          }
+        })(),
+        e(".recommendation-button").forEach((t) => {
+          t.addEventListener(
+            "click",
+            function (t) {
+              t.preventDefault();
+              const e = this.getAttribute("href") || "",
+                n = e.startsWith("#") ? e.substring(1) : e,
+                o = document.getElementById(n);
+              o &&
+                o.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                  inline: "nearest",
+                });
+            },
+            { passive: !0 }
+          );
+        }),
+        e('a[href^="#"]:not(.recommendation-button)').forEach((t) => {
+          t.addEventListener(
+            "click",
+            function (t) {
+              const e = this.getAttribute("href");
+              if (!e || "#" === e) return;
+              const n = document.querySelector(e);
+              if (n) {
+                t.preventDefault();
+                const e = Math.max(
+                  0,
+                  n.getBoundingClientRect().top + window.scrollY - 80
+                );
+                window.scrollTo({ top: e, behavior: "smooth" });
+              }
+            },
+            { passive: !0 }
+          );
+        }),
+        (function () {
+          const t = e("section[id]"),
+            n = e("[data-nav-link]");
+          if (!t.length || !n.length) return;
+          let o = !1;
+          const a = () => {
+            const e = window.scrollY + 100;
+            t.forEach((t) => {
+              const o = t.offsetTop,
+                a = t.offsetHeight,
+                s = t.getAttribute("id");
+              e >= o &&
+                e < o + a &&
+                n.forEach((t) => {
+                  t.classList.toggle(
+                    "active",
+                    t.getAttribute("href") === `#${s}`
+                  );
+                });
+            }),
+              (o = !1);
+          };
+          window.addEventListener("load", a),
+            window.addEventListener(
+              "scroll",
+              () => {
+                o || (window.requestAnimationFrame(a), (o = !0));
+              },
+              { passive: !0 }
+            );
+        })(),
+        (function () {
+          const t = e(".pricing-card");
+          t.length &&
+            t.forEach((e) => {
+              const n = e.querySelector(".order-now-btn");
+              e.addEventListener(
+                "mouseenter",
+                function (o) {
+                  (n && o.target === n) ||
+                    e.classList.contains("featured") ||
+                    (t.forEach((t) => {
+                      t.classList.contains("featured") ||
+                        ((t.style.transform = "scale(0.98)"),
+                        (t.style.opacity = "0.9"));
+                    }),
+                    (e.style.transform = "translateY(-10px)"),
+                    (e.style.opacity = "1"));
+                },
+                { passive: !0 }
+              ),
+                e.addEventListener(
+                  "mouseleave",
+                  function () {
+                    e.classList.contains("featured") ||
+                      (t.forEach((t) => {
+                        t.classList.contains("featured") ||
+                          ((t.style.transform = "scale(1)"),
+                          (t.style.opacity = "1"));
+                      }),
+                      (e.style.transform = ""),
+                      (e.style.opacity = ""));
+                  },
+                  { passive: !0 }
+                );
+            });
+        })(),
+        (function () {
+          const e = t(".accordion");
+          if (!e) return;
+          const n = (t) => {
+              const e = t.querySelector(".accordion-header"),
+                n = t.querySelector(".accordion-panel");
+              if (!e || !n) return;
+              e.setAttribute("aria-expanded", "false"),
+                (n.style.maxHeight = null),
+                t.classList.remove("active");
+              const o = e.querySelector(".fa-plus, .fa-minus");
+              o && (o.classList.remove("fa-minus"), o.classList.add("fa-plus"));
+            },
+            o = (t) => {
+              const o = t.querySelector(".accordion-header");
+              o &&
+                ("true" === o.getAttribute("aria-expanded")
+                  ? n(t)
+                  : ((t) => {
+                      const o = t.querySelector(".accordion-header"),
+                        a = t.querySelector(".accordion-panel");
+                      if (!o || !a) return;
+                      e.querySelectorAll(".accordion-item").forEach((e) => {
+                        e !== t && n(e);
+                      }),
+                        o.setAttribute("aria-expanded", "true"),
+                        (a.style.maxHeight = a.scrollHeight + "px"),
+                        t.classList.add("active");
+                      const s = o.querySelector(".fa-plus, .fa-minus");
+                      s &&
+                        (s.classList.remove("fa-plus"),
+                        s.classList.add("fa-minus"));
+                    })(t));
+            };
+          e.addEventListener("click", (t) => {
+            const n = t.target.closest(".accordion-header");
+            if (!n || !e.contains(n)) return;
+            t.preventDefault();
+            const a = n.parentElement;
+            a && a.classList.contains("accordion-item") && o(a);
+          }),
+            e.addEventListener("keydown", (t) => {
+              const n = t.target.closest(".accordion-header");
+              if (
+                n &&
+                e.contains(n) &&
+                ("Enter" === t.key || " " === t.key || "Spacebar" === t.key)
+              ) {
+                t.preventDefault();
+                const e = n.parentElement;
+                if (!e) return;
+                o(e);
+              }
+            }),
+            e.querySelectorAll(".accordion-item").forEach((t) => {
+              const e = t.querySelector(".accordion-header"),
+                n = t.querySelector(".accordion-panel");
+              if (e && n)
+                if (
+                  (e.hasAttribute("tabindex") ||
+                    e.setAttribute("tabindex", "0"),
+                  e.hasAttribute("role") || e.setAttribute("role", "button"),
+                  "true" === e.getAttribute("aria-expanded"))
+                ) {
+                  (n.style.maxHeight = n.scrollHeight + "px"),
+                    t.classList.add("active");
+                  const o = e.querySelector(".fa-plus, .fa-minus");
+                  o &&
+                    (o.classList.remove("fa-plus"),
+                    o.classList.add("fa-minus"));
+                } else {
+                  (n.style.maxHeight = null), t.classList.remove("active");
+                  const o = e.querySelector(".fa-plus, .fa-minus");
+                  o &&
+                    (o.classList.remove("fa-minus"),
+                    o.classList.add("fa-plus"));
+                }
+            }),
+            document.addEventListener(
+              "click",
+              (t) => {
+                e.contains(t.target) ||
+                  e.querySelectorAll(".accordion-item").forEach((t) => n(t));
+              },
+              { passive: !0 }
+            );
+        })();
+      const o = t(".cta-timer");
+      if (o && !o.getAttribute("data-countdown-date")) {
+        const t = 3456e5,
+          e = new Date(Date.now() + t);
+        o.setAttribute("data-countdown-date", e.toISOString());
+      }
+    }),
+    window.addEventListener(
+      "load",
+      () => {
+        o();
+        try {
+          setInterval(o, 1e3);
+        } catch (t) {}
+        e("[data-nav-link]").forEach((t, e) => {
+          try {
+            (t.style.opacity = "0"),
+              (t.style.transform = "translateY(10px)"),
+              (t.style.transition = `opacity 0.3s ease ${
+                0.1 * e
+              }s, transform 0.3s ease ${0.1 * e}s`),
+              t.offsetWidth,
+              (t.style.opacity = "1"),
+              (t.style.transform = "translateY(0)");
+          } catch (t) {}
+        });
+      },
+      { passive: !0 }
+    );
 })();
