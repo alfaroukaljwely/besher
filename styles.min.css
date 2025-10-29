@@ -1,3 +1,22 @@
+/* Font Awesome 6 Regular */
+@font-face {
+  font-family: 'Font Awesome 6 Regular';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fa-regular-400.woff2') format('woff2');
+}
+
+/* Font Awesome 6 Solid */
+@font-face {
+  font-family: 'Font Awesome 6 Solid';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('fa-solid-900.woff2') format('woff2');
+}
+
+
 .btn,.card-pricing{align-items:center}.card-pricing,.pricing-card.featured .card-pricing{background:linear-gradient(135deg,rgba(255,0,0,.1),rgba(204,0,0,.05))}h1,h2,h3,h4,h5,h6,p{margin-bottom:var(--spacing-md)}.original-price,p{color:var(--text-secondary)}.btn,.logo a{transition:.3s;text-decoration:none}.floating-whatsapp,.mobile-menu-btn{-webkit-tap-highlight-color:transparent;cursor:pointer}.btn,.floating-whatsapp,.logo a,.nav-link,a{text-decoration:none}.hero-title,.logo-text,.social-link.tiktok i{-webkit-text-fill-color:transparent}.btn,body{font-family:var(--font-primary)}.main,body{min-height:100vh}.footer-links ul,.nav-list,.payments-strip,.pricing-features ul,ul{list-style:none}*,.hero,.pricing-card,.pricing-cards,.testimonial-card{box-sizing:border-box;box-sizing:border-box}.btn-featured,.btn-modern,.card-badge{text-transform:uppercase;letter-spacing:.5px}.besher-discount,.btn,.discount-badge,.ticker-item{white-space:nowrap}.card-pricing{display:flex;justify-content:center;padding:1rem;border-radius:var(--radius-md);border:1px solid rgba(255,0,0,.2);box-shadow:0 4px 10px rgba(255,0,0,.1)}.original-price{opacity:.7;font-weight:500}.btn,.nav-link,.popular-tag{font-weight:600}.besher-pricing .current-price,.current-price{color:var(--youtube-red);text-shadow:0 2px 4px rgba(255,0,0,.3)}.section-title,a{color:var(--primary)}.logo-dot:hover,.nav-link:hover i{text-shadow:0 0 10px rgba(255,0,0,.5)}.discount-badge{background:var(--gradient-youtube);border-radius:var(--radius-full);box-shadow:var(--shadow-red);text-shadow:0 1px 2px rgba(0,0,0,.3)}@keyframes pulse-discount{0%,100%{transform:scale(1);box-shadow:var(--shadow-red)}50%{transform:scale(1.05);box-shadow:0 4px 12px rgba(255,0,0,.5)}}.pricing-card.featured .card-pricing{border:1px solid rgba(255,0,0,.3);box-shadow:var(--shadow-red)}.pricing-card.featured .current-price{background:var(--gradient-youtube);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;font-size:2rem;text-shadow:0 2px 4px rgba(255,0,0,.3)}.pricing-card.featured .discount-badge{background:var(--gradient-youtube);animation-duration:1.5s;box-shadow:var(--shadow-red)}:root{--primary:#00b4a6;--primary-dark:#008a7b;--secondary:#1a365d;--accent:#38b2ac;--youtube-red:#ff0000;--youtube-red-dark:#cc0000;--background:linear-gradient(
     135deg,
     #f7fafc 0%,
